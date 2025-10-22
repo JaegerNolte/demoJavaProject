@@ -7,20 +7,23 @@ import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
 import java.sql.*;
 
+
+// The UserRepository.java will convert the database results into User objects
+
 @Repository
 public class UserRepository {
 
     @Autowired
     private DataSource dataSource;
 
-
-    public boolean authenticateUser(String username, String password) {
-        String sql = "SELECT * FROM users WHERE username = ? AND password = ?";
+    public boolean authenticateUser(String username, String passwordHash, String email) {
+        String sql = "SELECT * FROM app_user WHERE username = ? AND password_hash = ? AND email = ?";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, username);
-            stmt.setString(2, password); // In real apps, use BCrypt hash
+            stmt.setString(2, passwordHash); // Later add Bcyrpt
+            stmt.setString(3, email);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 return rs.next(); // true if found
@@ -33,12 +36,13 @@ public class UserRepository {
 
     public Long registerUser(User user) {
 
-        String sql = "INSERT INTO users (username, password) VALUES (?, ?)";
+        String sql = "INSERT INTO app_user (username, password_hash, email) VALUES (?, ?, ?)";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setString(1, user.getUsername());
-            stmt.setString(2, user.getPassword());
+            stmt.setString(2, user.getPasswordHash());
+            stmt.setString(3, user.getEmail());
 
             int affected = stmt.executeUpdate();
 

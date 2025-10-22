@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/app_user")
 public class UserController {
 
     @Autowired
@@ -19,7 +19,7 @@ public class UserController {
     @PostMapping("/login")
     public String login(@RequestBody User user) {
 
-        boolean success = userService.login(user.getUsername(), user.getPassword());
+        boolean success = userService.login(user.getUsername(), user.getPasswordHash(), user.getEmail());
         return success ? "Login Successful!" : "Invalid credentials";
     }
 
